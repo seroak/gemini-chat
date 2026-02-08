@@ -34,18 +34,28 @@ describe('GeminiService', () => {
       const prompt = '안녕하세요';
 
       const mockGenerateContent = jest.fn().mockResolvedValue({
-        response: {
-          text: () => '안녕하세요! 무엇을 도와드릴까요?',
-        },
+        text: '안녕하세요! 무엇을 도와드릴까요?',
       });
+
+      // Mock client structure
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (service as any).model = {
-        generateContent: mockGenerateContent,
+      (service as any).client = {
+        models: {
+          generateContent: mockGenerateContent,
+        },
       };
 
       const result = await service.generateContent(prompt);
 
-      expect(mockGenerateContent).toHaveBeenCalledWith(prompt);
+      expect(mockGenerateContent).toHaveBeenCalledWith({
+        model: 'gemini-2.0-flash-exp',
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: prompt }],
+          },
+        ],
+      });
       expect(result).toBe('안녕하세요! 무엇을 도와드릴까요?');
     });
 
@@ -55,8 +65,10 @@ describe('GeminiService', () => {
 
       const mockGenerateContent = jest.fn().mockRejectedValue(new Error('API Error'));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (service as any).model = {
-        generateContent: mockGenerateContent,
+      (service as any).client = {
+        models: {
+          generateContent: mockGenerateContent,
+        },
       };
 
       await expect(service.generateContent('테스트')).rejects.toThrow(
@@ -71,17 +83,17 @@ describe('GeminiService', () => {
       const service = new GeminiService(configService);
 
       async function* mockStream() {
-        yield { text: () => '안녕' };
-        yield { text: () => '하세요' };
-        yield { text: () => '!' };
+        yield { text: '안녕' };
+        yield { text: '하세요' };
+        yield { text: '!' };
       }
 
-      const mockGenerateContentStream = jest.fn().mockResolvedValue({
-        stream: mockStream(),
-      });
+      const mockGenerateContentStream = jest.fn().mockResolvedValue(mockStream());
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (service as any).model = {
-        generateContentStream: mockGenerateContentStream,
+      (service as any).client = {
+        models: {
+          generateContentStream: mockGenerateContentStream,
+        },
       };
 
       const stream = service.generateContentStream('안녕하세요');
@@ -90,7 +102,15 @@ describe('GeminiService', () => {
         chunks.push(chunk);
       }
 
-      expect(mockGenerateContentStream).toHaveBeenCalledWith('안녕하세요');
+      expect(mockGenerateContentStream).toHaveBeenCalledWith({
+        model: 'gemini-2.0-flash-exp',
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: '안녕하세요' }],
+          },
+        ],
+      });
       expect(chunks).toEqual(['안녕', '하세요', '!']);
     });
   });
@@ -105,17 +125,17 @@ describe('GeminiService', () => {
         { role: 'model' as const, parts: [{ text: '안녕하세요! 무엇을 도와드릴까요?' }] },
       ];
 
-      const mockStartChat = jest.fn().mockReturnValue({
-        sendMessageStream: jest.fn().mockResolvedValue({
-          stream: (async function* () {
-            yield { text: () => 'TypeScript는' };
-            yield { text: () => ' 정적 타입 언어입니다.' };
-          })(),
-        }),
-      });
+      async function* mockStream() {
+        yield { text: 'TypeScript는' };
+        yield { text: ' 정적 타입 언어입니다.' };
+      }
+
+      const mockGenerateContentStream = jest.fn().mockResolvedValue(mockStream());
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (service as any).model = {
-        startChat: mockStartChat,
+      (service as any).client = {
+        models: {
+          generateContentStream: mockGenerateContentStream,
+        },
       };
 
       const stream = service.startChat('TypeScript에 대해 알려줘', history);
@@ -124,7 +144,13 @@ describe('GeminiService', () => {
         chunks.push(chunk);
       }
 
-      expect(mockStartChat).toHaveBeenCalledWith({ history });
+      expect(mockGenerateContentStream).toHaveBeenCalledWith({
+        model: 'gemini-2.0-flash-exp',
+        contents: [
+          ...history,
+          { role: 'user', parts: [{ text: 'TypeScript에 대해 알려줘' }] },
+        ],
+      });
       expect(chunks).toEqual(['TypeScript는', ' 정적 타입 언어입니다.']);
     });
 
@@ -132,16 +158,16 @@ describe('GeminiService', () => {
       const configService = createMockConfigService('test-api-key', 'gemini-2.0-flash-exp');
       const service = new GeminiService(configService);
 
-      const mockStartChat = jest.fn().mockReturnValue({
-        sendMessageStream: jest.fn().mockResolvedValue({
-          stream: (async function* () {
-            yield { text: () => '안녕하세요!' };
-          })(),
-        }),
-      });
+      async function* mockStream() {
+        yield { text: '안녕하세요!' };
+      }
+
+      const mockGenerateContentStream = jest.fn().mockResolvedValue(mockStream());
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (service as any).model = {
-        startChat: mockStartChat,
+      (service as any).client = {
+        models: {
+          generateContentStream: mockGenerateContentStream,
+        },
       };
 
       const stream = service.startChat('안녕하세요');
@@ -150,7 +176,12 @@ describe('GeminiService', () => {
         chunks.push(chunk);
       }
 
-      expect(mockStartChat).toHaveBeenCalledWith({ history: [] });
+      expect(mockGenerateContentStream).toHaveBeenCalledWith({
+        model: 'gemini-2.0-flash-exp',
+        contents: [
+          { role: 'user', parts: [{ text: '안녕하세요' }] },
+        ],
+      });
       expect(chunks).toEqual(['안녕하세요!']);
     });
   });

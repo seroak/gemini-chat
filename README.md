@@ -17,7 +17,7 @@ Google Gemini SDK를 활용한 ChatGPT 스타일 AI 챗봇 시스템입니다.
 |------|------|
 | Frontend | React 19 + Vite + TypeScript + Tailwind CSS v4 |
 | Backend | NestJS v11 + TypeORM + PostgreSQL 16 |
-| AI | Google Gemini SDK (`@google/generative-ai`) |
+| AI | Google Gemini SDK (`@google/genai`) |
 | 인증 | Passport + JWT |
 | 실시간 | Socket.IO |
 | 테스트 | Vitest (Frontend) + Jest (Backend) |

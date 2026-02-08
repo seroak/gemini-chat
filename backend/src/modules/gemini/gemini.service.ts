@@ -1,12 +1,11 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import { ChatMessage } from './dto/generate-content.dto';
 
 @Injectable()
 export class GeminiService {
-  private readonly genAI: GoogleGenerativeAI;
-  private readonly model: GenerativeModel;
+  private readonly client: GoogleGenAI;
   private readonly modelName: string;
 
   constructor(private readonly configService: ConfigService) {
@@ -16,8 +15,7 @@ export class GeminiService {
     }
 
     this.modelName = this.configService.get<string>('GEMINI_MODEL') || 'gemini-2.0-flash-exp';
-    this.genAI = new GoogleGenerativeAI(apiKey);
-    this.model = this.genAI.getGenerativeModel({ model: this.modelName });
+    this.client = new GoogleGenAI({ apiKey });
   }
 
   /**
@@ -25,9 +23,16 @@ export class GeminiService {
    */
   async generateContent(prompt: string): Promise<string> {
     try {
-      const result = await this.model.generateContent(prompt);
-      const response = result.response;
-      return response.text();
+      const result = await this.client.models.generateContent({
+        model: this.modelName,
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: prompt }],
+          },
+        ],
+      });
+      return result.text || '';
     } catch (error) {
       throw new InternalServerErrorException(
         'Failed to generate content from Gemini API',
@@ -41,10 +46,21 @@ export class GeminiService {
    */
   async *generateContentStream(prompt: string): AsyncGenerator<string> {
     try {
-      const result = await this.model.generateContentStream(prompt);
-      for await (const chunk of result.stream) {
-        const chunkText = chunk.text();
-        yield chunkText;
+      const result = await this.client.models.generateContentStream({
+        model: this.modelName,
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: prompt }],
+          },
+        ],
+      });
+
+      for await (const chunk of result) {
+        const chunkText = chunk.text;
+        if (chunkText) {
+          yield chunkText;
+        }
       }
     } catch (error) {
       throw new InternalServerErrorException(
@@ -59,15 +75,25 @@ export class GeminiService {
    */
   async *startChat(prompt: string, history: ChatMessage[] = []): AsyncGenerator<string> {
     try {
-      const chat = this.model.startChat({
-        history: history,
+      // 새로운 SDK에서는 history와 현재 프롬프트를 contents 배열로 합쳐서 전달합니다.
+      const contents = [
+        ...history,
+        {
+          role: 'user' as const,
+          parts: [{ text: prompt }],
+        },
+      ];
+
+      const result = await this.client.models.generateContentStream({
+        model: this.modelName,
+        contents: contents,
       });
 
-      const result = await chat.sendMessageStream(prompt);
-
-      for await (const chunk of result.stream) {
-        const chunkText = chunk.text();
-        yield chunkText;
+      for await (const chunk of result) {
+        const chunkText = chunk.text;
+        if (chunkText) {
+          yield chunkText;
+        }
       }
     } catch (error) {
       throw new InternalServerErrorException(

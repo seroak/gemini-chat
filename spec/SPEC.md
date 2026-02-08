@@ -53,7 +53,7 @@
 
 | 패키지 | 버전 | 용도 |
 |--------|------|------|
-| @google/generative-ai | ^0.24.0 | Google Gemini SDK |
+| @google/genai | ^1.0.0 | Google Gemini SDK |
 | @nestjs/websockets | ^11.0.0 | WebSocket 통합 |
 | @nestjs/platform-socket.io | ^11.0.0 | Socket.IO 어댑터 |
 | socket.io | ^4.8.1 | WebSocket 서버 |

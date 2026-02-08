@@ -1,26 +1,25 @@
----
-description: Google Gemini API integration guide and best practices
-globs: backend/src/**/gemini/**/*.ts
-alwaysApply: false
----
-
 # Gemini API Integration
 
 ## Basic Usage
 
 ```typescript
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
-const genAI = new GoogleGenerativeAI(apiKey);
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 // Simple response
-const result = await model.generateContent(prompt);
+const result = await client.models.generateContent({
+  model: "gemini-2.0-flash",
+  contents: [{ role: 'user', parts: [{ text: "Hello" }] }],
+});
 const response = result.response.text();
 
 // Streaming response
-const result = await model.generateContentStream(prompt);
-for await (const chunk of result.stream) {
+const resultStream = await client.models.generateContentStream({
+  model: "gemini-2.0-flash",
+  contents: [{ role: 'user', parts: [{ text: "Hello" }] }],
+});
+for await (const chunk of resultStream.stream) {
   const chunkText = chunk.text();
   // Send to client via WebSocket
 }
@@ -28,15 +27,23 @@ for await (const chunk of result.stream) {
 
 ## Multi-turn Conversation
 
+The new SDK uses a stateless approach where you pass the full conversation history in the `contents` array.
+
 ```typescript
-const chat = model.startChat({
-  history: [
-    { role: "user", parts: [{ text: "Hello" }] },
-    { role: "model", parts: [{ text: "Hello! How can I help you?" }] },
+const history = [
+  { role: "user", parts: [{ text: "Hello" }] },
+  { role: "model", parts: [{ text: "Hello! How can I help you?" }] },
+];
+
+const newPrompt = "Tell me about TypeScript";
+
+const result = await client.models.generateContentStream({
+  model: "gemini-2.0-flash",
+  contents: [
+    ...history,
+    { role: "user", parts: [{ text: newPrompt }] }
   ],
 });
-
-const result = await chat.sendMessageStream("Tell me about TypeScript");
 ```
 
 ## Best Practices
