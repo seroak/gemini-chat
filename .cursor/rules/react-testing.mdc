@@ -1,0 +1,37 @@
+---
+description: React frontend testing with Vitest and React Testing Library
+globs: frontend/src/**/*.test.*
+alwaysApply: false
+---
+
+# Frontend Testing (Vitest)
+
+## 컴포넌트 테스트
+
+```tsx
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
+
+describe('ChatMessage', () => {
+  it('메시지 내용을 렌더링한다', () => {
+    render(<ChatMessage message={mockMessage} />);
+    expect(screen.getByText('안녕하세요')).toBeInTheDocument();
+  });
+
+  it('전송 버튼 클릭 시 핸들러가 호출된다', async () => {
+    const user = userEvent.setup();
+    const handleSubmit = vi.fn();
+    render(<ChatInput onSubmit={handleSubmit} />);
+    await user.type(screen.getByRole('textbox'), 'Hello');
+    await user.click(screen.getByRole('button', { name: /전송/ }));
+    expect(handleSubmit).toHaveBeenCalledWith('Hello');
+  });
+});
+```
+
+## 핵심 규칙
+
+- Zustand 스토어, API 호출은 모킹
+- 파일 네이밍: `*.test.tsx` (소스와 같은 디렉토리)
+- `@testing-library/user-event`으로 사용자 상호작용

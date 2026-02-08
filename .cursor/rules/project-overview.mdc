@@ -1,0 +1,20 @@
+---
+description: Project overview, folder structure, and database schema
+alwaysApply: true
+---
+
+# Project Overview
+
+Gemini SDK 기반 AI 챗봇. pnpm 모노레포 (frontend + backend + shared).
+
+## 폴더 구조
+
+- `frontend/src/`: React 19 + Vite + Tailwind v4 (components/, pages/, hooks/, stores/, services/)
+- `backend/src/`: NestJS v11 (modules/{auth,users,chat,gemini}/, common/, config/, database/)
+- `shared/src/`: 공유 타입, 상수, 유틸리티
+
+## DB 스키마
+
+- **users**: id, email, password_hash, name, created_at, updated_at, deleted_at
+- **conversations**: id, user_id, title, created_at, updated_at, deleted_at (User N:1)
+- **messages**: id, conversation_id, role(user/assistant), content, created_at (Conversation N:1)

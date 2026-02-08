@@ -1,0 +1,52 @@
+---
+description: NestJS module structure, Controller/Service/DTO patterns, and Swagger rules
+globs: backend/src/modules/**/*.ts
+alwaysApply: false
+---
+
+# NestJS Module Patterns
+
+## 아키텍처 원칙
+
+- 기능(도메인)별 모듈 분리, 비즈니스 로직은 서비스 레이어에 집중
+- DI 적극 활용, ConfigService로 환경변수 접근 (하드코딩 금지)
+- 함수 20줄 이내, 클래스 200줄 이내
+
+## 모듈 구조
+
+```
+modules/{feature}/
+├── {feature}.module.ts / .controller.ts / .service.ts / .service.spec.ts
+├── dto/          # {action}.dto.ts, {feature}-response.dto.ts
+├── entities/     # {feature}.entity.ts
+└── guards/       # (필요 시)
+```
+
+## Controller
+
+- `@ApiTags` + `@ApiOperation` + `@ApiResponse` (type 지정 필수)
+- 인증: `@UseGuards(JwtAuthGuard)` + `@ApiBearerAuth()`
+- POST에서 200 반환 시 `@HttpCode(HttpStatus.OK)` 명시
+- 반환 타입 `Promise<T>` 명시
+
+## Service
+
+- `@Injectable()` 데코레이터 필수
+- 생성자 DI, private 헬퍼는 `private` 접근자 명시
+
+## DTO
+
+- 요청 DTO: `class-validator` 데코레이터 (`@IsEmail`, `@MinLength` 등)
+- 응답 DTO: `constructor(partial: Partial<T>)` 패턴, 민감 필드 `@Exclude()`
+- 모든 프로퍼티에 `@ApiProperty({ example, description })` 필수
+- example은 현실적 데이터 사용 ("string" 같은 플레이스홀더 금지)
+
+## 에러 처리
+
+- NestJS 내장 예외 사용, 메시지 한국어
+- 외부 API 호출은 try-catch 필수
+
+## Swagger
+
+- `@ApiTags('도메인')` 그룹화, `@ApiOkResponse({ type })` 응답 스키마 노출
+- 중첩 객체는 완전한 예시 구조, 날짜 ISO 8601, ID는 UUID 패턴

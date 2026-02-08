@@ -1,0 +1,65 @@
+---
+description: Development commands and environment variable reference
+alwaysApply: false
+---
+
+# Development Commands
+
+## Workspace (Root)
+
+```bash
+pnpm install                     # Install all dependencies
+pnpm dev                         # Run frontend + backend simultaneously
+pnpm build                       # Build all packages
+pnpm lint                        # Lint all packages
+pnpm test                        # Run all tests
+```
+
+## Frontend
+
+```bash
+pnpm --filter frontend dev       # Dev server (port: 5173)
+pnpm --filter frontend build     # Production build
+pnpm --filter frontend preview   # Preview build
+pnpm --filter frontend lint      # ESLint
+pnpm --filter frontend test      # Run tests
+```
+
+## Backend
+
+```bash
+pnpm --filter backend start:dev  # Dev server (port: 3000)
+pnpm --filter backend build      # Production build
+pnpm --filter backend start:prod # Production run
+pnpm --filter backend lint       # ESLint
+pnpm --filter backend test       # Unit tests
+pnpm --filter backend test:watch # Watch mode
+pnpm --filter backend test:cov   # Coverage
+pnpm --filter backend test:e2e   # E2E tests
+```
+
+## Database
+
+```bash
+docker-compose up -d                            # Start PostgreSQL
+docker-compose down                             # Stop PostgreSQL
+pnpm --filter backend migration:generate        # Generate migration
+pnpm --filter backend migration:run             # Run migrations
+pnpm --filter backend migration:revert          # Revert migration
+pnpm --filter backend seed:run                  # Run seed data
+```
+
+## Environment Variables
+
+### Backend (.env)
+
+- `PORT=3000`, `NODE_ENV=development`
+- `DB_HOST`, `DB_PORT=5432`, `DB_USERNAME`, `DB_PASSWORD`, `DB_DATABASE=ai_chatbot`
+- `JWT_SECRET`, `JWT_EXPIRATION=7d`
+- `CORS_ORIGIN=http://localhost:5173`
+- `GEMINI_API_KEY`, `GEMINI_MODEL=gemini-2.0-flash-exp`
+
+### Frontend (.env)
+
+- `VITE_API_URL=http://localhost:3000/api/v1`
+- `VITE_WS_URL=ws://localhost:3000`

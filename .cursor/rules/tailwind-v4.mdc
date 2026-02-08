@@ -1,0 +1,13 @@
+---
+description: Tailwind CSS v4 configuration and usage rules
+globs: "frontend/**/*.css, frontend/**/*.tsx"
+alwaysApply: false
+---
+
+# Tailwind CSS v4
+
+- **Vite 플러그인** 사용 (`@tailwindcss/vite`), PostCSS에 `tailwindcss` 플러그인 추가 금지 (충돌)
+- CSS 진입점: `@import 'tailwindcss'` (v3의 `@tailwind` 지시어 사용 금지)
+- 커스텀 테마: `@theme { --color-primary: #6366f1; }` 블록 사용
+- 유틸리티 클래스 우선, 인라인 스타일 금지
+- 커스텀 색상: `primary`, `primary-hover`, `secondary`, `secondary-hover`

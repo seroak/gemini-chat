@@ -1,0 +1,15 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { UserResponseDto } from '../../users/dto/user-response.dto';
+
+export class AuthResponseDto {
+  @ApiProperty()
+  user: UserResponseDto;
+
+  @ApiProperty()
+  accessToken: string;
+
+  constructor(user: UserResponseDto, accessToken: string) {
+    this.user = user;
+    this.accessToken = accessToken;
+  }
+}

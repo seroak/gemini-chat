@@ -1,0 +1,48 @@
+---
+description: Google Gemini API integration guide and best practices
+globs: backend/src/**/gemini/**/*.ts
+alwaysApply: false
+---
+
+# Gemini API Integration
+
+## Basic Usage
+
+```typescript
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const genAI = new GoogleGenerativeAI(apiKey);
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+
+// Simple response
+const result = await model.generateContent(prompt);
+const response = result.response.text();
+
+// Streaming response
+const result = await model.generateContentStream(prompt);
+for await (const chunk of result.stream) {
+  const chunkText = chunk.text();
+  // Send to client via WebSocket
+}
+```
+
+## Multi-turn Conversation
+
+```typescript
+const chat = model.startChat({
+  history: [
+    { role: "user", parts: [{ text: "Hello" }] },
+    { role: "model", parts: [{ text: "Hello! How can I help you?" }] },
+  ],
+});
+
+const result = await chat.sendMessageStream("Tell me about TypeScript");
+```
+
+## Best Practices
+
+- **API key security**: Manage via env vars; never expose to client.
+- **Rate limiting**: Limit API call frequency (e.g., 60 calls/minute).
+- **Error handling**: Handle API errors properly (quota exceeded, network errors, etc.).
+- **Prompt optimization**: Avoid unnecessarily long prompts (affects cost and speed).
+- Optimize Gemini API calls: prevent unnecessary requests, maintain appropriate prompt length.

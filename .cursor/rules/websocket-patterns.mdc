@@ -1,0 +1,29 @@
+---
+description: Socket.IO WebSocket event naming and connection management
+globs: "backend/src/**/*.gateway.ts, frontend/src/hooks/use-streaming*"
+alwaysApply: false
+---
+
+# WebSocket Patterns (Socket.IO)
+
+## 이벤트 네이밍
+
+| 이벤트 | 방향 | 용도 |
+|--------|------|------|
+| `sendMessage` | Client → Server | 메시지 전송 |
+| `messageSaved` | Server → Client | 사용자 메시지 저장 확인 |
+| `streamChunk` | Server → Client | AI 응답 스트리밍 청크 |
+| `streamEnd` | Server → Client | 스트리밍 완료 |
+| `streamError` | Server → Client | 에러 발생 |
+
+## 연결 관리
+
+- 인증: 연결 시 `auth: { token }` 전달, 서버에서 JWT 검증
+- 재연결: 최대 5회, 1초 간격
+- 에러 처리: `streamError` 이벤트로 클라이언트에 에러 전달
+
+## Gateway (Backend)
+
+- `@WebSocketGateway({ cors })` 데코레이터
+- `@SubscribeMessage('eventName')` 핸들러
+- JWT 미들웨어로 소켓 연결 인증

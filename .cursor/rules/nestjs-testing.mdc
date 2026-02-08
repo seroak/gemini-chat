@@ -1,0 +1,35 @@
+---
+description: NestJS backend unit test patterns with Jest
+globs: backend/**/*.spec.ts
+alwaysApply: false
+---
+
+# Backend Testing (Jest)
+
+## 단위 테스트 패턴
+
+```typescript
+describe('UsersService', () => {
+  let service: UsersService;
+  const mockRepository = { findOne: jest.fn(), create: jest.fn(), save: jest.fn() };
+
+  beforeEach(async () => {
+    const module = await Test.createTestingModule({
+      providers: [
+        UsersService,
+        { provide: getRepositoryToken(User), useValue: mockRepository },
+      ],
+    }).compile();
+    service = module.get(UsersService);
+  });
+
+  afterEach(() => jest.clearAllMocks());
+});
+```
+
+## 핵심 규칙
+
+- TypeORM Repository 모킹: `getRepositoryToken(Entity)`
+- `afterEach`에서 `jest.clearAllMocks()` 호출
+- 테스트 변수: `mockX`, `inputX`, `expectedX` 네이밍
+- ConfigService 모킹: `createMockConfigService` 헬퍼 사용 (생성자에서 API 키 참조 시)

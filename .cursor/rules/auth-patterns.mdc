@@ -1,0 +1,27 @@
+---
+description: Authentication initialization and route protection patterns
+globs: frontend/src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Auth Patterns (Frontend)
+
+## AuthInitializer
+
+앱 시작 시 인증 상태 복원. `BrowserRouter` 내부, `Routes` 외부에 배치.
+
+1. `restoreToken()`으로 localStorage에서 토큰 복원
+2. 토큰 있으면 `authService.getMe()`로 사용자 정보 조회
+3. 성공 시 `setAuth(user, token)`, 실패 시 `logout()`
+
+## ProtectedRoute
+
+- `isLoading` 중: 로딩 스피너 표시
+- 미인증: `<Navigate to="/login" state={{ from: location }} replace />`
+- 인증됨: children 렌더링
+
+## 토큰 관리
+
+- 저장: `localStorage.setItem('token', token)`
+- 복원: `useAuthStore.restoreToken()` → `isLoading: false` 설정
+- Axios 인터셉터로 자동 주입: `Authorization: Bearer <token>`

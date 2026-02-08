@@ -1,0 +1,20 @@
+{
+  "name": "ai-chatbot-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI Chatbot System with Gemini SDK",
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter frontend dev\" \"pnpm --filter backend start:dev\"",
+    "build": "pnpm --filter shared build && pnpm --filter frontend build && pnpm --filter backend build",
+    "lint": "pnpm --filter frontend lint && pnpm --filter backend lint",
+    "test": "pnpm --filter frontend test && pnpm --filter backend test",
+    "clean": "pnpm -r exec rm -rf node_modules dist .turbo"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

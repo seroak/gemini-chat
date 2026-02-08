@@ -1,0 +1,44 @@
+---
+description: React frontend conventions, state management, and design patterns
+globs: frontend/src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# React Conventions
+
+## 컴포넌트 패턴
+
+- **함수형 컴포넌트**만 사용 (화살표 함수 + `export default`)
+- Props: `type`으로 컴포넌트 상단에 정의
+- 이벤트 핸들러: `handle` 접두사, 커스텀 훅: `use` 접두사
+- key prop에 index 금지, 불필요한 `<div>` 래핑 금지
+
+## 경로 별칭
+
+`@/*` → `./src/*`, `@shared/*` → `../shared/src/*`
+
+## 상태 관리 (Zustand)
+
+```typescript
+const useAuthStore = create<AuthState>((set) => ({
+  user: null, token: null, isAuthenticated: false,
+  setUser: (user, token) => set({ user, token, isAuthenticated: true }),
+  logout: () => set({ user: null, token: null, isAuthenticated: false }),
+}));
+```
+
+- `create<State>` 제네릭 타입 명시
+- 파일명: `{feature}-store.ts`, 훅: `use{Feature}Store`
+- 용도: UI 상태, 인증 등 클라이언트 전용 상태
+
+## API 서비스 (Axios)
+
+- `axios.create({ baseURL: import.meta.env.VITE_API_URL })`
+- 인터셉터로 토큰 자동 주입
+- 서비스 파일: `{feature}-service.ts`
+
+## 설계 원칙
+
+- 매직 넘버 대신 명명된 상수, 복잡한 로직은 커스텀 훅으로 추출
+- Props Drilling 대신 컴포넌트 합성, 조기 추상화 지양
+- `React.lazy` + `Suspense`로 코드 스플리팅

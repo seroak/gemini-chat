@@ -1,0 +1,34 @@
+---
+description: TypeORM entity patterns, migration rules, and database conventions
+globs: "backend/src/**/*.entity.ts, backend/src/database/**/*.ts"
+alwaysApply: false
+---
+
+# NestJS Database Patterns
+
+## Entity 규칙
+
+- UUID 기본: `@PrimaryGeneratedColumn('uuid')`
+- 컬럼명 `snake_case` ↔ 프로퍼티 `camelCase` 매핑
+- 모든 Entity에 `createdAt`, `updatedAt`, `deletedAt` 포함
+- Soft Delete 기본: `@DeleteDateColumn({ name: 'deleted_at' })`
+- 관계: `@ManyToOne`, `@OneToMany` + `@JoinColumn({ name: 'fk_column' })`
+- 자주 조회하는 컬럼에 `@Index` 추가
+
+## 마이그레이션
+
+- 스키마 변경은 반드시 마이그레이션 사용 (직접 DB 수정 금지)
+- 생성: `pnpm --filter backend migration:generate`
+- 실행: `pnpm --filter backend migration:run`
+
+## 설정 패턴
+
+- `ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' })`
+- 커스텀 설정: `registerAs('key', () => ({ ... }))`
+- JWT: `JwtModule.registerAsync({ ... })`
+- Rate Limiting: `ThrottlerModule.forRoot([{ ttl: 60000, limit: 60 }])`
+
+## 쿼리 최적화
+
+- N+1 방지: TypeORM `relations` 또는 `QueryBuilder` 활용
+- 시드 데이터로 초기 데이터 관리

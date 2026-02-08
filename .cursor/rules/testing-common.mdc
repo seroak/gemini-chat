@@ -1,0 +1,35 @@
+---
+description: Common TDD principles, AAA pattern, and coverage targets
+globs: "**/*.{spec,test}.*"
+alwaysApply: false
+---
+
+# Testing Rules (TDD)
+
+## TDD 사이클: Red → Green → Refactor
+
+1. **Red**: 실패하는 테스트 먼저 작성
+2. **Green**: 테스트 통과하는 최소 코드 작성
+3. **Refactor**: 테스트 유지하며 코드 개선
+
+## 원칙
+
+- **테스트 우선**: 구현 전에 테스트 코드 작성
+- **AAA 패턴**: Arrange-Act-Assert
+- **행위 중심** 설명 (한국어)
+- 경계값, 예외 케이스, 정상 케이스 모두 커버
+- 외부 의존성(DB, API)은 반드시 모킹
+- 테스트 간 상태 공유 금지
+
+## 커버리지 목표
+
+- 서비스 레이어: **90%+**, 핵심 로직: **80%+**, 유틸리티: **100%**
+
+## 테스트 파일 종류
+
+| 종류 | 파일 패턴 | 범위 |
+|------|-----------|------|
+| 단위 | `*.spec.ts` | Service, utility, hook |
+| 통합 | `*.integration-spec.ts` | 모듈 간 상호작용 |
+| E2E | `*.e2e-spec.ts` | API 엔드포인트 전체 |
+| 컴포넌트 | `*.test.tsx` | React 렌더링/상호작용 |

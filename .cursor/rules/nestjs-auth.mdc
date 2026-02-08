@@ -1,0 +1,37 @@
+---
+description: JWT authentication strategy, guards, and auth patterns
+globs: backend/src/modules/auth/**/*.ts
+alwaysApply: false
+---
+
+# NestJS Auth Patterns
+
+## JWT 인증
+
+- Payload: `{ sub: userId, email }`
+- Bearer Token: `Authorization: Bearer <token>`
+- 가드: `@UseGuards(JwtAuthGuard)` + `@ApiBearerAuth()`
+
+## JWT Strategy
+
+```typescript
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor(configService: ConfigService, usersService: UsersService) {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: configService.get<string>('JWT_SECRET'),
+    });
+  }
+  async validate(payload: JwtPayload) {
+    const user = await this.usersService.findById(payload.sub);
+    if (!user) throw new UnauthorizedException('인증되지 않은 사용자입니다');
+    return user;
+  }
+}
+```
+
+## 비밀번호
+
+- 해싱: `bcrypt.hash(password, 10)`, 비교: `bcrypt.compare(plainText, hash)`

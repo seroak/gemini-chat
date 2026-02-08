@@ -1,0 +1,33 @@
+---
+description: General coding standards, naming conventions, and git conventions
+alwaysApply: true
+---
+
+# Coding Standards
+
+## 일반 규칙
+
+- TypeScript 필수, `any` 금지. 세미콜론, 작은따옴표, trailing comma 항상 사용.
+- 들여쓰기 2칸. UTF-8/LF. 매직 넘버 금지. `console.log` 프로덕션 금지.
+
+## 네이밍
+
+| 대상 | 규칙 | 예시 |
+|------|------|------|
+| 파일명 | kebab-case | `auth.service.ts` |
+| 클래스/컴포넌트 | PascalCase | `AuthService` |
+| 함수/변수 | camelCase | `findByEmail` |
+| 상수 | UPPER_SNAKE_CASE | `API_BASE_URL` |
+| 타입/인터페이스 | PascalCase (`I` 접두사 금지) | `User` |
+| DB 테이블/컬럼 | snake_case | `user_id` |
+| boolean | 동사 접두사 | `isLoading` |
+
+## Import 순서
+
+1. 외부 패키지 → 2. 내부 모듈 (`@shared/`) → 3. 상대 경로
+
+## Commit (Conventional Commits)
+
+`feat:` | `fix:` | `docs:` | `style:` | `refactor:` | `test:` | `chore:`
+
+Branch: `main` / `develop` / `feature/<name>` / `fix/<name>`

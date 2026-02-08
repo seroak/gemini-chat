@@ -1,0 +1,16 @@
+---
+description: Security rules and best practices
+alwaysApply: true
+---
+
+# Security Rules
+
+- Store sensitive information in **environment variables** (DB password, JWT secret, Gemini API key, etc.).
+- **Never commit** `.env` files (must be in `.gitignore`).
+- Use **JWT-based authentication**.
+- Hash passwords with **bcrypt** before storing.
+- Configure **CORS** settings appropriately.
+- Use **Helmet** for HTTP security headers.
+- Apply **rate limiting** to prevent API abuse (especially AI API calls).
+- Always perform **input validation** on user input.
+- **Gemini API key** must only be used server-side; never expose to the client.
